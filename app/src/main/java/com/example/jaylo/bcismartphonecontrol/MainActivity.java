@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent serviceIntent = new Intent(this, MyAccessibilityService.class);
         startService(serviceIntent);
-
+        //Will work on UI
 
 
     }
