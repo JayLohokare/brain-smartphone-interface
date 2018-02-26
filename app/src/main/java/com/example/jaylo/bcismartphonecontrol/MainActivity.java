@@ -1,16 +1,20 @@
 package com.example.jaylo.bcismartphonecontrol;
 
 import android.Manifest;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceActivity;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +31,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
         }
         else{
-            Intent serviceIntent = new Intent(this, MyAccessibilityService.class);
-            startService(serviceIntent);
-            finish();
+            launchService();
         }
     }
 
@@ -52,17 +54,39 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //Checking if service has accessibility permissions
+    public static boolean isAccessibilityEnabled(Context context, String id) {
+
+        AccessibilityManager am = (AccessibilityManager) context
+                .getSystemService(Context.ACCESSIBILITY_SERVICE);
+
+        List<AccessibilityServiceInfo> runningServices = am
+                .getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
+        for (AccessibilityServiceInfo service : runningServices) {
+            if (id.equals(service.getId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
             if (Settings.canDrawOverlays(this)) {
-                Intent serviceIntent = new Intent(this, MyAccessibilityService.class);
-                startService(serviceIntent);
-                finish();
+                launchService();
             }
             else{
                 testPermission();
             }
         }
+    }
+
+    public void launchService(){
+
+        Intent serviceIntent = new Intent(this, MyAccessibilityService.class);
+        startService(serviceIntent);
+        finish();
     }
 }
