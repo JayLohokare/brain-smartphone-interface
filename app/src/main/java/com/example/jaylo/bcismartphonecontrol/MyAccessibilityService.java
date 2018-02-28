@@ -155,7 +155,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
             return;
         }
 
-        int actions = accessibilityNodeInfo.getActions();
+        //int actions = accessibilityNodeInfo.getActions();
         //Log.d("Actions count", Integer.toString(actions));
         //Log.d("Action List", accessibilityNodeInfo.getActionList().toString());
 
@@ -181,10 +181,12 @@ public class MyAccessibilityService extends AccessibilityService implements View
                 continue;
             }
             Log.d("Class is:", current.getClassName().toString());
-            if (current.getClassName().toString().contains("Button")) {
-                //Log.d("Found Button", current.toString());
-                buttonsMap.put(buttonId++, current);
+            //if (current.getClassName().toString().contains("Button")) {
+            if (current.isClickable()) {
+                    //Log.d("Found Button", current.toString());
+                    buttonsMap.put(buttonId++, current);
             }
+
             int childrenCount = current.getChildCount();
             for (int i = 0; i < childrenCount; i++) {
                 stack.push(current.getChild(i));
