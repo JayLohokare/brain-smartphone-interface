@@ -36,8 +36,8 @@ import java.util.Map;
 public class MyAccessibilityService extends AccessibilityService implements View.OnTouchListener, View.OnClickListener {
 
 
-    private static Map<Integer, AccessibilityNodeInfo> buttonsMap = new HashMap<>();
-    private static int buttonId;
+
+
 
     private View topLeftView;
 
@@ -48,7 +48,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
     private int originalYPos;
     private boolean moving;
     private WindowManager wm;
-
+    private RelativeLayout rl;
 
     @Override
     public void onServiceConnected() {
@@ -106,7 +106,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
         View view = inflater.inflate(R.layout.relative_layout, null);
 
 
-        RelativeLayout rl = (RelativeLayout) view.findViewById(R.id.relative_layout);
+        rl = (RelativeLayout) view.findViewById(R.id.relative_layout);
 
         RelativeLayout.LayoutParams param;
         int width=300,height=300;
@@ -118,27 +118,13 @@ public class MyAccessibilityService extends AccessibilityService implements View
             param.topMargin = 0;
             rl.addView(bArray[i], param);
         }
-        /*
-        param = new RelativeLayout.LayoutParams(400, 400);
-        param.leftMargin = 500;
-        param.topMargin = 0;
-        rl.addView(overlayedButton2, param);
-*/
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT);
         //params.gravity = Gravity.LEFT | Gravity.CENTER;
         params.x = 0;
         params.y = 0;
         wm.addView(rl, params);
-/*
-        topLeftView = new View(this);
-        WindowManager.LayoutParams topLeftParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT);
-        topLeftParams.gravity = Gravity.LEFT | Gravity.TOP;
-        topLeftParams.x = 0;
-        topLeftParams.y = 0;
-        topLeftParams.width = 0;
-        topLeftParams.height = 0;
-        wm.addView(topLeftView, topLeftParams);*/
+
     }
 
     @Override
@@ -170,45 +156,44 @@ public class MyAccessibilityService extends AccessibilityService implements View
         }
 
         int actions = accessibilityNodeInfo.getActions();
-        Log.d("Actions count", Integer.toString(actions));
-        Log.d("Action List", accessibilityNodeInfo.getActionList().toString());
+        //Log.d("Actions count", Integer.toString(actions));
+        //Log.d("Action List", accessibilityNodeInfo.getActionList().toString());
 
-        Log.d("Finding Clickable items", "Here they are");
+        //Log.d("Finding Clickable items", "Here they are");
 
+        /*
         List<AccessibilityNodeInfo> buttons = accessibilityNodeInfo.findAccessibilityNodeInfosByText("Button");
         for (int i = 0; i < buttons.size(); i++) {
             Log.d("Button: ", i + buttons.get(i).toString());
-        }
-
-        /*getClassName*/
-        /* accessibilityNodeInfo.getChild() */
-        /*   accessibilityNodeInfo.getChildCount()*/
+        }*/
 
         Deque<AccessibilityNodeInfo> stack = new LinkedList<>();
+        Map<Integer, AccessibilityNodeInfo> buttonsMap = new HashMap<>();
+        int buttonId=0;
+
 
         stack.push(accessibilityNodeInfo);
+
+
         while (!stack.isEmpty()) {
             AccessibilityNodeInfo current = stack.pop();
             if (current == null) {
                 continue;
             }
             Log.d("Class is:", current.getClassName().toString());
-            if (current.getClassName().toString().indexOf("Button") != -1) {
-                Log.d("Found Button", current.toString());
+            if (current.getClassName().toString().contains("Button")) {
+                //Log.d("Found Button", current.toString());
                 buttonsMap.put(buttonId++, current);
             }
             int childrenCount = current.getChildCount();
             for (int i = 0; i < childrenCount; i++) {
                 stack.push(current.getChild(i));
             }
-
         }
 
         for (int i : buttonsMap.keySet()) {
-            Log.d("Map Contents", "key = " + i + ", value = " + buttonsMap.get(i).toString());
+            Log.d("Map Contents", "key = " + i + ", value = " + buttonsMap.get(i).getClassName());
         }
-        //Log.d("Map Contents", buttonsMap.toString());
-
     }
 
     @Override
