@@ -6,11 +6,13 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.os.IBinder;
 
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
+import android.support.constraint.solver.widgets.Rectangle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -24,6 +26,7 @@ import android.view.accessibility.AccessibilityRecord;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Deque;
@@ -41,7 +44,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
 
     private View topLeftView;
 
-    private Button overlayedButton,overlayedButton2,overlayedButton3;
+    //private Button overlayedButton,overlayedButton2,overlayedButton3;
     private float offsetX;
     private float offsetY;
     private int originalXPos;
@@ -49,6 +52,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
     private boolean moving;
     private WindowManager wm;
     private RelativeLayout rl;
+    RelativeLayout.LayoutParams param;
 
     @Override
     public void onServiceConnected() {
@@ -80,6 +84,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
         super.onCreate();
         wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 
+        /*
         overlayedButton = new Button(this);
         overlayedButton.setText("1");
         overlayedButton.setOnTouchListener(this);
@@ -100,16 +105,31 @@ public class MyAccessibilityService extends AccessibilityService implements View
         overlayedButton3.setAlpha(1.0f);
         overlayedButton3.setBackgroundColor(0x55fe4444);
         overlayedButton3.setOnClickListener(this);
-
-
+*/
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.relative_layout, null);
-
-
         rl = (RelativeLayout) view.findViewById(R.id.relative_layout);
 
-        RelativeLayout.LayoutParams param;
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT);
+        //params.gravity = Gravity.LEFT | Gravity.CENTER;
+        params.x = 0;
+        params.y = 0;
+        wm.addView(rl, params);
+    }
+
+    @Override
+    public void onAccessibilityEvent(AccessibilityEvent event) {
+
+        //TODO Need to write the logic for cleaning previous window contents
+
+        Log.d("Event", "Recorded a new event");
+        Map<Integer,AccessibilityNodeInfo> map;
+        map = findTextAndClick(this);
+        Rect r;
+        AccessibilityNodeInfo a;
         int width=300,height=300;
+        TextView tv;
+        /*
         Button[] bArray = {overlayedButton,overlayedButton2,overlayedButton3};
 
         for(int i=0;i<3;i++) {
@@ -118,27 +138,30 @@ public class MyAccessibilityService extends AccessibilityService implements View
             param.topMargin = 0;
             rl.addView(bArray[i], param);
         }
+        */
 
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT);
-        //params.gravity = Gravity.LEFT | Gravity.CENTER;
-        params.x = 0;
-        params.y = 0;
-        wm.addView(rl, params);
-
-    }
-
-    @Override
-    public void onAccessibilityEvent(AccessibilityEvent event) {
-
-        Log.d("Event", "Recorded a new event");
-
-        findTextAndClick(this);
+        for (int i : map.keySet()) {
+            tv = new TextView(this);
+            tv.setText(""+i+"");
+            tv.setAlpha(1.0f);
+            tv.setBackgroundColor(0x55fe4444);
+            a = map.get(i);
+            r = new Rect();
+            a.getBoundsInScreen(r);
+            r.sort();
+            param = new RelativeLayout.LayoutParams( r.width(), r.height());
+            param.leftMargin = r.left;
+            param.topMargin = r.top;
+            // I think these margins are redundant
+            //param.rightMargin = r.right;
+            //param.bottomMargin = r.bottom;
+            rl.addView(tv,param);
+        }
 
         AccessibilityNodeInfo source = event.getSource();
         if (source == null) {
             return;
         }
-        Log.d("Source of event:", source.toString());
     }
 
 
@@ -148,11 +171,11 @@ public class MyAccessibilityService extends AccessibilityService implements View
     }
 
 
-    public static void findTextAndClick(AccessibilityService accessibilityService) {
-
+    public static Map<Integer, AccessibilityNodeInfo> findTextAndClick(AccessibilityService accessibilityService) {
+        Map<Integer, AccessibilityNodeInfo> buttonsMap = new HashMap<>();
         AccessibilityNodeInfo accessibilityNodeInfo = accessibilityService.getRootInActiveWindow();
         if (accessibilityNodeInfo == null) {
-            return;
+            return buttonsMap;
         }
 
         //int actions = accessibilityNodeInfo.getActions();
@@ -168,9 +191,8 @@ public class MyAccessibilityService extends AccessibilityService implements View
         }*/
 
         Deque<AccessibilityNodeInfo> stack = new LinkedList<>();
-        Map<Integer, AccessibilityNodeInfo> buttonsMap = new HashMap<>();
-        int buttonId=0;
 
+        int buttonId=0;
 
         stack.push(accessibilityNodeInfo);
 
@@ -196,6 +218,8 @@ public class MyAccessibilityService extends AccessibilityService implements View
         for (int i : buttonsMap.keySet()) {
             Log.d("Map Contents", "key = " + i + ", value = " + buttonsMap.get(i).getClassName());
         }
+
+        return buttonsMap;
     }
 
     @Override
