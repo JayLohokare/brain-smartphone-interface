@@ -52,8 +52,9 @@ public class MyAccessibilityService extends AccessibilityService implements View
     private boolean moving;
     private WindowManager wm;
     private RelativeLayout rl;
-    RelativeLayout.LayoutParams param;
-
+    private RelativeLayout.LayoutParams param;
+    private LayoutInflater inflater;
+    private View view;
     @Override
     public void onServiceConnected() {
         Log.d("Service notification", "Accessibility service started and connected");
@@ -83,31 +84,8 @@ public class MyAccessibilityService extends AccessibilityService implements View
     public void onCreate() {
         super.onCreate();
         wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-
-        /*
-        overlayedButton = new Button(this);
-        overlayedButton.setText("1");
-        overlayedButton.setOnTouchListener(this);
-        overlayedButton.setAlpha(1.0f);
-        overlayedButton.setBackgroundColor(0x55fe4444);
-        overlayedButton.setOnClickListener(this);
-
-        overlayedButton2 = new Button(this);
-        overlayedButton2.setText("2");
-        overlayedButton2.setOnTouchListener(this);
-        overlayedButton2.setAlpha(1.0f);
-        overlayedButton2.setBackgroundColor(0x55fe4444);
-        overlayedButton2.setOnClickListener(this);
-
-        overlayedButton3 = new Button(this);
-        overlayedButton3.setText("3");
-        overlayedButton3.setOnTouchListener(this);
-        overlayedButton3.setAlpha(1.0f);
-        overlayedButton3.setBackgroundColor(0x55fe4444);
-        overlayedButton3.setOnClickListener(this);
-*/
-        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.relative_layout, null);
+        inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view = inflater.inflate(R.layout.relative_layout, null);
         rl = (RelativeLayout) view.findViewById(R.id.relative_layout);
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT);
@@ -121,6 +99,19 @@ public class MyAccessibilityService extends AccessibilityService implements View
     public void onAccessibilityEvent(AccessibilityEvent event) {
 
         //TODO Need to write the logic for cleaning previous window contents
+        /*
+        int i=0;
+        int childCount = rl.getChildCount();
+        View childList[] = new View[childCount];
+        while (i<childCount){
+            childList[i]=rl.getChildAt(i);
+        }
+
+        for(View v : childList){
+            rl.remo
+        }
+        */
+        rl.removeAllViews();
 
         Log.d("Event", "Recorded a new event");
         Map<Integer,AccessibilityNodeInfo> map;
@@ -139,6 +130,9 @@ public class MyAccessibilityService extends AccessibilityService implements View
             rl.addView(bArray[i], param);
         }
         */
+
+
+
 
         for (int i : map.keySet()) {
             tv = new TextView(this);
