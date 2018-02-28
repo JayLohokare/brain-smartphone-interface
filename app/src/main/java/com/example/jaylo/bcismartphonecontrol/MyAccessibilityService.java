@@ -41,7 +41,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
 
     private View topLeftView;
 
-    private Button overlayedButton,overlayedButton2;
+    private Button overlayedButton,overlayedButton2,overlayedButton3;
     private float offsetX;
     private float offsetY;
     private int originalXPos;
@@ -94,22 +94,36 @@ public class MyAccessibilityService extends AccessibilityService implements View
         overlayedButton2.setBackgroundColor(0x55fe4444);
         overlayedButton2.setOnClickListener(this);
 
+        overlayedButton3 = new Button(this);
+        overlayedButton3.setText("3");
+        overlayedButton3.setOnTouchListener(this);
+        overlayedButton3.setAlpha(1.0f);
+        overlayedButton3.setBackgroundColor(0x55fe4444);
+        overlayedButton3.setOnClickListener(this);
+
 
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.relative_layout, null);
 
-        RelativeLayout rl = (RelativeLayout) view.findViewById(R.id.relative_layout);
-        RelativeLayout.LayoutParams param;
-        param = new RelativeLayout.LayoutParams(400, 400);
-        param.leftMargin = 0;
-        param.topMargin = 0;
-        rl.addView(overlayedButton, param);
 
+        RelativeLayout rl = (RelativeLayout) view.findViewById(R.id.relative_layout);
+
+        RelativeLayout.LayoutParams param;
+        int width=300,height=300;
+        Button[] bArray = {overlayedButton,overlayedButton2,overlayedButton3};
+
+        for(int i=0;i<3;i++) {
+            param = new RelativeLayout.LayoutParams( width, height);
+            param.leftMargin = i*300;
+            param.topMargin = 0;
+            rl.addView(bArray[i], param);
+        }
+        /*
         param = new RelativeLayout.LayoutParams(400, 400);
         param.leftMargin = 500;
         param.topMargin = 0;
         rl.addView(overlayedButton2, param);
-
+*/
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT);
         //params.gravity = Gravity.LEFT | Gravity.CENTER;
