@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -29,7 +28,6 @@ import java.util.Map;
 public class MyAccessibilityService extends AccessibilityService implements View.OnTouchListener, View.OnClickListener {
 
 
-
     private static Map<Integer, AccessibilityNodeInfo> buttonsMap;
 
     private View topLeftView;
@@ -49,6 +47,61 @@ public class MyAccessibilityService extends AccessibilityService implements View
     public static Map<Integer, AccessibilityNodeInfo> getButtonsMap() {
         return buttonsMap;
     }
+
+    public static Map<Integer, AccessibilityNodeInfo> findTextAndClick(AccessibilityService accessibilityService) {
+        buttonsMap = new HashMap<>();
+        AccessibilityNodeInfo accessibilityNodeInfo = accessibilityService.getRootInActiveWindow();
+        if (accessibilityNodeInfo == null) {
+            return buttonsMap;
+        }
+
+        //int actions = accessibilityNodeInfo.getActions();
+        //Log.d("Actions count", Integer.toString(actions));
+        //Log.d("Action List", accessibilityNodeInfo.getActionList().toString());
+
+        //Log.d("Finding Clickable items", "Here they are");
+
+        /*
+        List<AccessibilityNodeInfo> buttons = accessibilityNodeInfo.findAccessibilityNodeInfosByText("Button");
+        for (int i = 0; i < buttons.size(); i++) {
+            Log.d("Button: ", i + buttons.get(i).toString());
+        }*/
+
+        Deque<AccessibilityNodeInfo> stack = new LinkedList<>();
+
+        int buttonId = 0;
+
+        stack.push(accessibilityNodeInfo);
+
+
+        while (!stack.isEmpty()) {
+            AccessibilityNodeInfo current = stack.pop();
+            if (current == null) {
+                continue;
+            }
+            Log.d("Class is:", current.getClassName().toString());
+            //if (current.getClassName().toString().contains("Button")) {
+            if (current.isClickable()) {
+                //Log.d("Found Button", current.toString());
+                buttonsMap.put(buttonId++, current);
+            }
+
+            int childrenCount = current.getChildCount();
+            for (int i = 0; i < childrenCount; i++) {
+                stack.push(current.getChild(i));
+            }
+        }
+
+        Log.d("Map Contents", "------------------------------------------------------------------------");
+        for (int i : buttonsMap.keySet()) {
+            Log.d("Map Contents", "key = " + i + ", value = " + buttonsMap.get(i).getClassName());
+        }
+        Log.d("Map Contents", "------------------------------------------------------------------------");
+
+
+        return buttonsMap;
+    }
+
 
     @Override
     public void onServiceConnected() {
@@ -71,7 +124,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
     @Override
     public void onDestroy() {
 
-        Intent serviceIntent = new Intent(this.getApplicationContext(), MyAccessibilityService.class);
+        Intent serviceIntent = new Intent(getApplicationContext(), MyAccessibilityService.class);
         startService(serviceIntent);
     }
 
@@ -79,7 +132,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
     public void onCreate() {
         super.onCreate();
         wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         view = inflater.inflate(R.layout.relative_layout, null);
         rl = (RelativeLayout) view.findViewById(R.id.relative_layout);
 
@@ -109,11 +162,10 @@ public class MyAccessibilityService extends AccessibilityService implements View
         rl.removeAllViews();
 
         Log.d("Event", "Recorded a new event");
-        Map<Integer,AccessibilityNodeInfo> map;
-        map = findTextAndClick(this);
+        buttonsMap = findTextAndClick(this);
         Rect r;
         AccessibilityNodeInfo a;
-        int width=300,height=300;
+        int width = 300, height = 300;
         TextView tv;
         /*
         Button[] bArray = {overlayedButton,overlayedButton2,overlayedButton3};
@@ -127,24 +179,22 @@ public class MyAccessibilityService extends AccessibilityService implements View
         */
 
 
-
-
-        for (int i : map.keySet()) {
+        for (int i : buttonsMap.keySet()) {
             tv = new TextView(this);
-            tv.setText(""+i+"");
+            tv.setText("" + i + "");
             tv.setAlpha(1.0f);
             tv.setBackgroundColor(0x55fe4444);
-            a = map.get(i);
+            a = buttonsMap.get(i);
             r = new Rect();
             a.getBoundsInScreen(r);
             r.sort();
-            param = new RelativeLayout.LayoutParams( r.width(), r.height());
+            param = new RelativeLayout.LayoutParams(r.width(), r.height());
             param.leftMargin = r.left;
             param.topMargin = r.top;
             // I think these margins are redundant
             //param.rightMargin = r.right;
             //param.bottomMargin = r.bottom;
-            rl.addView(tv,param);
+            rl.addView(tv, param);
         }
 
         AndroidBCIConnector.sendOverlayNumber(5);
@@ -155,66 +205,9 @@ public class MyAccessibilityService extends AccessibilityService implements View
         }
     }
 
-
     @Override
     public void onInterrupt() {
 
-    }
-
-
-    public static Map<Integer, AccessibilityNodeInfo> findTextAndClick(AccessibilityService accessibilityService) {
-        buttonsMap = new HashMap<>();
-        AccessibilityNodeInfo accessibilityNodeInfo = accessibilityService.getRootInActiveWindow();
-        if (accessibilityNodeInfo == null) {
-            return buttonsMap;
-        }
-
-        //int actions = accessibilityNodeInfo.getActions();
-        //Log.d("Actions count", Integer.toString(actions));
-        //Log.d("Action List", accessibilityNodeInfo.getActionList().toString());
-
-        //Log.d("Finding Clickable items", "Here they are");
-
-        /*
-        List<AccessibilityNodeInfo> buttons = accessibilityNodeInfo.findAccessibilityNodeInfosByText("Button");
-        for (int i = 0; i < buttons.size(); i++) {
-            Log.d("Button: ", i + buttons.get(i).toString());
-        }*/
-
-        Deque<AccessibilityNodeInfo> stack = new LinkedList<>();
-
-        int buttonId=0;
-
-        stack.push(accessibilityNodeInfo);
-
-
-        while (!stack.isEmpty()) {
-            AccessibilityNodeInfo current = stack.pop();
-            if (current == null) {
-                continue;
-            }
-            Log.d("Class is:", current.getClassName().toString());
-            //if (current.getClassName().toString().contains("Button")) {
-            if (current.isClickable()) {
-                    //Log.d("Found Button", current.toString());
-                    buttonsMap.put(buttonId++, current);
-            }
-
-            int childrenCount = current.getChildCount();
-            for (int i = 0; i < childrenCount; i++) {
-                stack.push(current.getChild(i));
-            }
-        }
-
-        Log.d("Map Contents", "------------------------------------------------------------------------");
-        for (int i : buttonsMap.keySet()) {
-            Log.d("Map Contents", "key = " + i + ", value = " + buttonsMap.get(i).getClassName());
-        }
-        Log.d("Map Contents", "------------------------------------------------------------------------");
-
-
-
-        return buttonsMap;
     }
 
     @Override
@@ -225,10 +218,9 @@ public class MyAccessibilityService extends AccessibilityService implements View
 
     @Override
     public boolean onTouch(View v, MotionEvent e) {
-        int xpos=(int) e.getX();
-        int ypos=(int) e.getY();
-        switch (e.getAction())
-        {
+        int xpos = (int) e.getX();
+        int ypos = (int) e.getY();
+        switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Log.d("DEBUG", "On touch (down)" + String.valueOf(xpos) + String.valueOf(ypos));
             case MotionEvent.ACTION_UP:
