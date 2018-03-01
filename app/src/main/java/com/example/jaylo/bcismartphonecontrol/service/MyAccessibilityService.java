@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jaylo.bcismartphonecontrol.R;
+import com.example.jaylo.bcismartphonecontrol.bcibridge.AndroidBCIConnector;
 
 import java.util.Deque;
 import java.util.HashMap;
@@ -146,6 +147,8 @@ public class MyAccessibilityService extends AccessibilityService implements View
             rl.addView(tv,param);
         }
 
+        AndroidBCIConnector.sendOverlayNumber(5);
+
         AccessibilityNodeInfo source = event.getSource();
         if (source == null) {
             return;
@@ -209,6 +212,8 @@ public class MyAccessibilityService extends AccessibilityService implements View
         }
         Log.d("Map Contents", "------------------------------------------------------------------------");
 
+
+
         return buttonsMap;
     }
 
@@ -219,7 +224,19 @@ public class MyAccessibilityService extends AccessibilityService implements View
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        return false;
+    public boolean onTouch(View v, MotionEvent e) {
+        int xpos=(int) e.getX();
+        int ypos=(int) e.getY();
+        switch (e.getAction())
+        {
+            case MotionEvent.ACTION_DOWN:
+                Log.d("DEBUG", "On touch (down)" + String.valueOf(xpos) + String.valueOf(ypos));
+            case MotionEvent.ACTION_UP:
+                Log.d("DEBUG", "On touch (up)" + String.valueOf(xpos) + String.valueOf(ypos));
+            case MotionEvent.ACTION_MOVE:
+                Log.d("DEBUG", "On touch (move)" + String.valueOf(xpos) + String.valueOf(ypos));
+                break;
+        }
+        return true;
     }
 }

@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class AndroidBCIConnector {
 
-    public boolean sendOverlayNumber(int num) {
+    public static boolean sendOverlayNumber(int num) {
         Map<Integer, AccessibilityNodeInfo> buttonsMap = MyAccessibilityService.getButtonsMap();
         if(buttonsMap == null || !buttonsMap.containsKey(num)) {
             return false;
@@ -23,9 +23,11 @@ public class AndroidBCIConnector {
 
         AccessibilityNodeInfo node = buttonsMap.get(num);
         List<AccessibilityNodeInfo.AccessibilityAction> actionList = node.getActionList();
+        System.out.println("List of actions that can be performed:");
         for(AccessibilityNodeInfo.AccessibilityAction action : actionList) {
             System.out.println(action.toString());
         }
+        node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
 
         return true;
     }
