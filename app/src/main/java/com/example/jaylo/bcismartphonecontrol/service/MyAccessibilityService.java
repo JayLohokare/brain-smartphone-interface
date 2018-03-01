@@ -1,46 +1,35 @@
-package com.example.jaylo.bcismartphonecontrol;
+package com.example.jaylo.bcismartphonecontrol.service;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
-import android.os.Handler;
-import android.os.IBinder;
 
-import android.os.Looper;
-import android.speech.tts.TextToSpeech;
-import android.support.constraint.solver.widgets.Rectangle;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.view.accessibility.AccessibilityRecord;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.jaylo.bcismartphonecontrol.R;
+
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class MyAccessibilityService extends AccessibilityService implements View.OnTouchListener, View.OnClickListener {
 
 
 
-
+    private static Map<Integer, AccessibilityNodeInfo> buttonsMap;
 
     private View topLeftView;
 
@@ -55,6 +44,11 @@ public class MyAccessibilityService extends AccessibilityService implements View
     private RelativeLayout.LayoutParams param;
     private LayoutInflater inflater;
     private View view;
+
+    public static Map<Integer, AccessibilityNodeInfo> getButtonsMap() {
+        return buttonsMap;
+    }
+
     @Override
     public void onServiceConnected() {
         Log.d("Service notification", "Accessibility service started and connected");
@@ -166,7 +160,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
 
 
     public static Map<Integer, AccessibilityNodeInfo> findTextAndClick(AccessibilityService accessibilityService) {
-        Map<Integer, AccessibilityNodeInfo> buttonsMap = new HashMap<>();
+        buttonsMap = new HashMap<>();
         AccessibilityNodeInfo accessibilityNodeInfo = accessibilityService.getRootInActiveWindow();
         if (accessibilityNodeInfo == null) {
             return buttonsMap;
@@ -209,9 +203,11 @@ public class MyAccessibilityService extends AccessibilityService implements View
             }
         }
 
+        Log.d("Map Contents", "------------------------------------------------------------------------");
         for (int i : buttonsMap.keySet()) {
             Log.d("Map Contents", "key = " + i + ", value = " + buttonsMap.get(i).getClassName());
         }
+        Log.d("Map Contents", "------------------------------------------------------------------------");
 
         return buttonsMap;
     }
@@ -219,6 +215,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
     @Override
     public void onClick(View v) {
         Toast.makeText(this, "Overlay button click event", Toast.LENGTH_SHORT).show();
+//        v.getOverlay().getClass().
     }
 
     @Override
