@@ -2,6 +2,9 @@ package com.example.jaylo.bcismartphonecontrol.service;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -19,11 +22,13 @@ import android.widget.Toast;
 
 import com.example.jaylo.bcismartphonecontrol.R;
 import com.example.jaylo.bcismartphonecontrol.bcibridge.AndroidBCIConnector;
+import com.example.jaylo.bcismartphonecontrol.bcibridge.SampleGattAttributes;
 
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.UUID;
 
 public class MyAccessibilityService extends AccessibilityService implements View.OnTouchListener, View.OnClickListener {
 
@@ -43,6 +48,9 @@ public class MyAccessibilityService extends AccessibilityService implements View
     private RelativeLayout.LayoutParams param;
     private LayoutInflater inflater;
     private View view;
+
+
+
 
     public static Map<Integer, AccessibilityNodeInfo> getButtonsMap() {
         return buttonsMap;

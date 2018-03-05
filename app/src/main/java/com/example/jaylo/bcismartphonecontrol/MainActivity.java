@@ -129,6 +129,10 @@ public class MainActivity extends AppCompatActivity {
 
         Intent serviceIntent = new Intent(this, MyAccessibilityService.class);
         //startService(serviceIntent);
+
+        final Intent intent = new Intent(this, com.example.jaylo.bcismartphonecontrol.bcibridge.DeviceScanActivity.class);
+        startActivity(intent);
+
         finish();
     }
 
