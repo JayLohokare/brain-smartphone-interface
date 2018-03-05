@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //Checking if service has accessibility permissions
     public static boolean isAccessibilityEnabled(Context context, String id) {
 
         AccessibilityManager am = (AccessibilityManager) context
@@ -84,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void launchService(){
+
 
         Intent serviceIntent = new Intent(this, MyAccessibilityService.class);
         startService(serviceIntent);

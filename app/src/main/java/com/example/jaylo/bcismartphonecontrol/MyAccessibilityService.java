@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.os.IBinder;
 
@@ -33,7 +34,7 @@ import java.util.Map;
 public class MyAccessibilityService extends AccessibilityService implements View.OnTouchListener, View.OnClickListener {
 
 
-    private static Map<Integer, AccessibilityNodeInfo> buttonsMap = new HashMap<>();
+    private static Map<Integer, AccessibilityNodeInfo> buttonsMap;
     private static int buttonId;
 
     private View topLeftView;
@@ -51,10 +52,6 @@ public class MyAccessibilityService extends AccessibilityService implements View
     public void onServiceConnected()
     {
         Log.d("Service notification", "Accessibility service started and connected");
-
-
-
-
         AccessibilityServiceInfo info = new AccessibilityServiceInfo();
         info.eventTypes = AccessibilityEvent.TYPES_ALL_MASK;
         info.notificationTimeout = 100;
@@ -78,7 +75,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
     @Override
     public void onCreate() {
         super.onCreate();
-        wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        /*wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 
         overlayedButton = new Button(this);
         overlayedButton.setText("Overlay button");
@@ -100,7 +97,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
         topLeftParams.y = 0;
         topLeftParams.width = 0;
         topLeftParams.height = 0;
-        wm.addView(topLeftView, topLeftParams);
+        wm.addView(topLeftView, topLeftParams);*/
     }
 
     @Override
@@ -126,6 +123,8 @@ public class MyAccessibilityService extends AccessibilityService implements View
 
     public static void findTextAndClick(AccessibilityService accessibilityService) {
 
+        buttonsMap = new HashMap<>();
+
         AccessibilityNodeInfo accessibilityNodeInfo = accessibilityService.getRootInActiveWindow();
         if (accessibilityNodeInfo == null) {
             return;
@@ -140,6 +139,7 @@ public class MyAccessibilityService extends AccessibilityService implements View
         List<AccessibilityNodeInfo> buttons = accessibilityNodeInfo.findAccessibilityNodeInfosByText("Button");
         for (int i = 0; i < buttons.size(); i++) {
             Log.d("Button: ", i + buttons.get(i).toString());
+
         }
 
         /*getClassName*/
@@ -155,9 +155,14 @@ public class MyAccessibilityService extends AccessibilityService implements View
                 continue;
             }
             Log.d("Class is:", current.getClassName().toString());
-            if(current.getClassName().toString().indexOf("Button") != -1) {
+            if(current.isClickable() && current.getClassName().toString().indexOf("Button") != -1) {
                 Log.d("Found Button", current.toString());
                 buttonsMap.put(buttonId++, current);
+
+                Rect nodePosition = new Rect();
+                current.getBoundsInScreen(nodePosition);
+                Log.d("Button found","Button window" + nodePosition.toString());
+
             }
             int childrenCount = current.getChildCount();
             for(int i = 0; i < childrenCount; i++) {
@@ -167,9 +172,12 @@ public class MyAccessibilityService extends AccessibilityService implements View
         }
 
         for(int i : buttonsMap.keySet()) {
+
+
             Log.d("Map Contents", "key = " + i + ", value = " + buttonsMap.get(i).toString());
+
         }
-        //Log.d("Map Contents", buttonsMap.toString());
+        Log.d("Map Contents", buttonsMap.toString());
 
     }
 
