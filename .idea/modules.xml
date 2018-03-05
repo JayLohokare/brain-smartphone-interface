@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BCIsmartphonecontrol.iml" filepath="$PROJECT_DIR$/BCIsmartphonecontrol.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/brain-smartphone-interface-new.iml" filepath="$PROJECT_DIR$/.idea/brain-smartphone-interface-new.iml" />
     </modules>
   </component>
 </project>
