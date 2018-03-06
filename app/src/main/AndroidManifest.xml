@@ -28,6 +28,16 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".bcibridge.DeviceControl">
+        </activity>
+
+        <activity android:name=".bcibridge.DeviceScanActivity">
+        </activity>
+
+        <service
+            android:name=".bcibridge.BluetoothLeService"
+            android:enabled="true" />
+
 
         <service
         android:name=".service.MyAccessibilityService"
@@ -42,7 +52,7 @@
             android:name="android.accessibilityservice"
             android:resource="@xml/accessibilityservice" />
 
-    </service>
+        </service>
 
 
     </application>

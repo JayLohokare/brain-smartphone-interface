@@ -208,12 +208,8 @@ public class DeviceControl extends Activity {
         bStream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //TODO access send characteristic here
                 if(mConnected){
-                    //TODO access send characteristic here
-                    //BluetoothGattCharacteristic characteristic = "2d30c083-f39f-4ce6-923f-3484ea480596";
-
-                    //we use this only when the device is a ganglion
-                    //char c = toggleDataStream(characteristic);
                     char cmd = (char) mCommands[mCommandIdx];
                     Log.v(TAG,"Sending Command : "+cmd);
                     mGanglionSend.setValue(new byte[]{(byte)cmd});
@@ -225,8 +221,7 @@ public class DeviceControl extends Activity {
             }
         });
 
-        getActionBar().setTitle(mDeviceName);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
 
         Log.v(TAG,"Creating Service to Handle all further BLE Interactions");
